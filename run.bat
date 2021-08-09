@@ -1,0 +1,1 @@
+docker run -it --cap-add=NET_ADMIN --device /dev/net/tun --net=host -v %CD%:/app ceo_crawler:0.0.1 /bin/bash
