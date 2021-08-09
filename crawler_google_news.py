@@ -139,7 +139,7 @@ def crawling_google_news(keyword, alliances, max_search=100, idle_sec=2):
 
     # Setup Headers
     headers = {
-        "user-agent": UserAgent().random,
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.229 Whale/2.10.123.42 Safari/537.36",
         "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
     }
 
