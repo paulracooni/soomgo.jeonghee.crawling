@@ -139,10 +139,10 @@ def crawling_google_news(keyword, alliances, max_search=100, idle_sec=2):
 
     # Setup Headers
     headers = {
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.229 Whale/2.10.123.42 Safari/537.36",
-        "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.115 Safari/537.36 Edg/92.0.902.67",
+        "Accept": "text/html,*/*;q=0.8"
     }
-
+        # user-agent: "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/92.0.4515.131 Safari/537.36 Edg/92.0.902.67"
     # Setup Cookies
     session = requests.Session()
     googleTrendsUrl = 'https://google.com'
@@ -200,7 +200,7 @@ def get_processed_keywords(ext='.csv'):
         listdir(DIR_NEWS_CRAWLING) )
     processed_keywords = map(
         lambda file_name: file_name.replace(ext, ''),
-        processed_keywords )
+        processed_keywords)
     return list(processed_keywords)
 
 if __name__ == '__main__':
