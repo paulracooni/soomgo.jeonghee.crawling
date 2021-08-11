@@ -1,5 +1,6 @@
 from time import sleep
 import pandas as pd
+from crawlers.utils import get_external_ip
 from .utils import *
 
 
@@ -8,11 +9,18 @@ class VpnGate:
         self.prev_ip = []
         self.process = None
 
-    def connect_server(self, wait_sec=10):
+    def connect_server(self, try_n=3, wait_sec=10):
         self.disconnect()
+        current_ip = get_external_ip()
         path_ovpn = saveOvpn(self.get_server())
         self.process = connect(path_ovpn)
-        sleep(wait_sec)
+
+        try_cnt = 0
+        while current_ip != get_external_ip():
+            sleep(wait_sec)
+            if try_cnt > try_n:
+                break
+            try_cnt +=1
     
     def disconnect(self, wait_sec=0.5):
         if self.process != None:
