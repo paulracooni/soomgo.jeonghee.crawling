@@ -15,7 +15,7 @@ class VpnGate:
         sleep(wait_sec)
     
     def disconnect(self, wait_sec=0.5):
-        if self.process == None:
+        if self.process != None:
             self.process.terminate()
             sleep(wait_sec)
 
