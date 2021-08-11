@@ -1,6 +1,6 @@
 import requests
 from os import path, makedirs
-from vpngate import VpnGate
+from vpngate.VpnGate import VpnGate
 from .utils import get_user_agent, get_external_ip
 
 class CrawlerBase:

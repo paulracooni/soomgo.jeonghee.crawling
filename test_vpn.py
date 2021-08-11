@@ -13,3 +13,5 @@ print(f"Current IP : {get_external_ip()}")
 sleep(3)
 response = requests.get("https://www.google.com")
 print(f"After vpn, {response.status_code}")
+
+vpn_gate.disconnect()
