@@ -1,14 +1,4 @@
-#!/usr/bin/env python2
-
-import pandas as pd
 import requests, json, sys, base64, tempfile, subprocess, time
-
-__author__ = "Paul.Kim"
-__copyright__ = "Copyright 2020+, Paul.Kim"
-__license__ = "GPLv3"
-__version__ = "1.0"
-__maintainer__ = "Paul.Kim"
-__email__ = "paul.kim@honeynaps.com"
 
 OPENVPN_PATH = "openvpn"
 VPNGATE_API_URL = "http://www.vpngate.net/api/iphone/"
@@ -16,26 +6,6 @@ DEFAULT_COUNTRY = "US"
 SELECTED_COUNTRY = ""
 DEFAULT_SERVER = 0
 YES = False
-
-class VpnGate:
-    def __init__(self):
-        self.prev_ip = []
-
-    def get_server(self):
-        server = dict()
-        while not server or server.get('IP', '') in self.prev_ip:
-            server = self.__get_server()
-
-        self.prev_ip.append(server.get('IP'))
-        return server
-
-    def __get_server(self):
-        servers = getServers()
-        servers = pd.DataFrame(servers)
-        servers = servers[~servers.IP.isin(self.prev_ip)]
-        servers = servers.sort_values(by='Speed', ascending=False).iloc[:30].sample(1)
-        server = list(servers.T.to_dict().values())[0]
-        return server
 
 def getServers():
     servers = []
@@ -163,45 +133,3 @@ def _connect(ovpn_path):
         while openvpn_process.poll() != 0:
             time.sleep(1)
         print("[=] Disconnected OpenVPN.")
-
-if __name__ == "__main__":
-    if len(sys.argv) > 1:
-        if sys.argv[1] == "-y":
-            YES = True
-        else:
-            SELECTED_COUNTRY = sys.argv[1]
-
-    servers = []
-    try:
-        print("[-] Trying to get server's informations...")
-        servers = sorted(getServers(), key=lambda server: int(server["Score"]), reverse=True)
-    except:
-        print("[!] Failed to get server's informations from vpngate.")
-        sys.exit(1)
-
-    if not servers:
-        print("[!] There is no running server on vpngate.")
-        sys.exit(1)
-
-    print("[-] Got server's informations.")
-
-    countries = sorted(getCountries(servers))
-
-    if not SELECTED_COUNTRY:
-        printCountries(countries)
-
-    selected_country = selectCountry(countries)
-
-    print("[-] Gethering %s servers..." % (selected_country, ))
-
-    selected_servers = [server for server in servers if server['CountryShort'] == selected_country]
-    printServers(selected_servers)
-    selected_server = selectServer(selected_servers)
-
-    print("[-] Generating .ovpn file of %s..." % (selected_server["IP"], ))
-
-    ovpn_path = saveOvpn(selected_server)
-
-    print("[-] Connecting to %s..." % (selected_server["IP"], ))
-
-    connect(ovpn_path)
