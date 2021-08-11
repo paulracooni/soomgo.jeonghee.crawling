@@ -1,4 +1,4 @@
-import requests, json, sys, base64, tempfile, subprocess, time
+import requests, base64, tempfile, subprocess
 
 OPENVPN_PATH = "openvpn"
 VPNGATE_API_URL = "http://www.vpngate.net/api/iphone/"
