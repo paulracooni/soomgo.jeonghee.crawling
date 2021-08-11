@@ -1,6 +1,6 @@
 import requests
 from os import path, makedirs
-from vpngate import VpnGate
+# from vpngate import VpnGate
 from .utils import get_user_agent, get_external_ip
 
 class CrawlerBase:
@@ -8,14 +8,14 @@ class CrawlerBase:
     base_url  = ""
     debug_dir = ""
     use_vpn   = False
-    vpn_gate  = VpnGate()
+    # vpn_gate  = VpnGate()
 
     def run(self):
         raise NotImplementedError
 
     def reset(self):
-        if self.use_vpn:
-            self.vpn_gate.connect_server()
+        # if self.use_vpn:
+            # self.vpn_gate.connect_server()
         self.set_session()
         self.set_headers()
         self.set_cookies()

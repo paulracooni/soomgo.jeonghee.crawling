@@ -17,10 +17,10 @@ class VpnGate:
 
         try_cnt = 0
         while current_ip != get_external_ip():
+            if try_cnt > try_n: break
             sleep(wait_sec)
-            if try_cnt > try_n:
-                break
             try_cnt +=1
+
     
     def disconnect(self, wait_sec=0.5):
         if self.process != None:
