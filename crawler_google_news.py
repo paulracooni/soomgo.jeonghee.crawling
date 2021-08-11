@@ -52,9 +52,6 @@ import pandas as pd
 
 from vpngate import VpnGate, saveOvpn, connect
 
-
-from fake_useragent import UserAgent
-
 def get_external_ip():
     return requests.get('https://api.ipify.org').text
 
