@@ -3,3 +3,4 @@ openpyxl
 selenium
 requests
 beautifulsoup4
+python-dotenv
