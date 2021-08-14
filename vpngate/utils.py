@@ -47,5 +47,9 @@ def saveOvpn(server):
     return ovpn_path
 
 def connect(ovpn_path):
-    return subprocess.Popen([OPENVPN_PATH, '--config', ovpn_path])
+    return subprocess.Popen(
+        args   = [OPENVPN_PATH, '--config', ovpn_path],
+        stdout = subprocess.PIPE,
+        stderr = subprocess.PIPE,
+    )
 

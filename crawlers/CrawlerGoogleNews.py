@@ -1,4 +1,5 @@
 import re
+import requests
 from tqdm import tqdm
 from time import sleep
 from bs4 import BeautifulSoup
@@ -6,8 +7,7 @@ from urllib.parse import quote_plus
 
 from newsplease import NewsPlease
 from .CrawlerBase import CrawlerBase
-
-'#main > div:nth-child(5) > div > div:nth-child(1) > a'
+from .utils import get_user_agent
 
 class CrawlerGoogleNews(CrawlerBase):
 
@@ -20,76 +20,62 @@ class CrawlerGoogleNews(CrawlerBase):
 
     def __init__(self,
         base_url        = "https://www.google.com",
-        result_per_page = 10,
+        test_url        = "https://www.google.com/search?tbm=nws&q=hello",
+        result_per_page = 100,
         use_vpn         = True,
         idle_sec        = 2,
         debug_dir       = '',
+        verbose         = True,
     ):
 
         self.use_vpn         = use_vpn
         self.base_url        = base_url
+        self.test_url        = test_url
         self.result_per_page = result_per_page
         self.idle_sec        = idle_sec
         self.debug_dir       = debug_dir
+        self.verbose         = verbose
         self.reset()
+
+    def set_headers(self):
+        assert self.base_url, "Please set self.base_url"
+        self.headers = {
+            'user-agent': get_user_agent(),
+            'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'accept-language': 'en-GB,en-US;q=0.9,en;q=0.8',
+            'referer'        : self.base_url
+        }
+
+    def set_cookies(self):
+        self.cookies = dict()
 
     def test(self, keyword, lang='en', max_search=500):
         url = self.__build_url(keyword, start=0, lang=lang)
         response = self.get(url)
         return response
 
-    def run(self, keyword, lang='en', max_search=500, verbose=True):
+    def run(self, keyword, lang='en', max_search=500):
 
-        if verbose: pbar = tqdm(total=max_search)
+        url = self.__build_url(keyword, start=0, num=max_search, lang=lang)
+        response, _ = self.get(url)
+        if not isinstance(response, requests.Response):
+            return []
+        soup = BeautifulSoup(response.content, 'html.parser', from_encoding='utf-8')
+        news_urls = self.__extr_news_urls(soup)
 
-        results, n_searched = [], 0
-        while n_searched < max_search:
+        return news_urls
 
-            sleep(self.idle_sec)
+    def __build_url(self, keyword, start=0, num=100,lang='en'):
 
-            # Build URL for google news search
-            url = self.__build_url(keyword, start=n_searched, lang=lang)
+        url = f"{self.base_url}/search?"+\
+              f"&tbm=nws"+\
+              f"&hl={lang}"+\
+              f"&q={quote_plus(keyword)}"+\
+              f"&num={num}"
 
-            # Request[GET]
-            response = self.get(url)
+        url = url + f"&start={start}" if start else url
 
-            # Parse lists
-            soup = BeautifulSoup(response.content, 'html.parser', from_encoding='utf-8')
-            news_urls = self.__extr_news_urls(soup)
-
-            if len(news_urls) == 0:
-                self.save_response_as_html(response, "no_news_cards")
-                return results
-
-            for news_url in news_urls:
-
-                article_html = self.get(news_url).content
-                article = NewsPlease.from_html(article_html)
-
-                if article.maintext == None or article.language != lang:
-                    continue
-
-                results.append(dict(
-                    keyword       = keyword,
-                    source_domain = article.source_domain,
-                    date_publish  = article.date_publish,
-                    language      = article.language,
-                    title         = article.title,
-                    maintext      = article.maintext,
-                    url           = url,
-                ))
-                n_searched += 1
-
-                if verbose:
-                    pbar.update(1)
-                    pbar.set_description(article.title[:10]+'...')
-
-                if n_searched < max_search:
-                    break
-
-        if verbose: pbar.close()
-
-        return results
+        return url
 
     def __extr_news_urls(self, soup):
 
@@ -105,25 +91,16 @@ class CrawlerGoogleNews(CrawlerBase):
         news_card_urls = []
         for news_card in news_cards:
             href = news_card.get('href', '')
-            if not href.startswith('http'):
-                href = self.base_url + href
-            news_card_urls.append(href)
+
+            if href.startswith('/url?q='):
+                href = href.replace('/url?q=', '')
+
+            if '&' in href:
+                href = href[:href.find('&')]
+
+            if href.startswith('http') and 'google.com' not in href:
+                news_card_urls.append(href)
+
 
         return news_card_urls
-
-    def __extr_link(self, news_card):
-
-        return news_card.get('href', '')
-
-    def __build_url(self, keyword, start=0, lang='en'):
-
-        url = f"{self.base_url}/search?"+\
-              f"&q={quote_plus(keyword)}"+\
-              f"&tbm=nws"+\
-              f"&hl={lang}"+\
-              f"&num={self.result_per_page}"
-
-        url = url + f"&start={start}" if start else url
-
-        return url
 

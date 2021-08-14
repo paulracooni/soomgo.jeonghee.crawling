@@ -33,4 +33,8 @@ def get_external_ip():
     Returns:
         str: external_ip
     """
-    return requests.get('https://api.ipify.org').text
+    try:
+        external_ip = requests.get('https://api.ipify.org', timeout=5).text
+    except requests.exceptions.Timeout:
+        external_ip = ''
+    return external_ip

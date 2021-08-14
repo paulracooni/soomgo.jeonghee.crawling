@@ -3,11 +3,11 @@ import pandas as pd
 from crawlers import CrawlerGoogleNews
 
 crawler = CrawlerGoogleNews(
-    base_url        = "https://www.google.com",
-    result_per_page = 100,
-    use_vpn         = False,
-    idle_sec        = 2,
-    debug_dir       = './',
+    result_per_page = 10,
+    use_vpn         = True,
+    idle_sec        = 1,
+    debug_dir       = './debug_html',
+    verbose = True
 )
 
 response = crawler.run(
@@ -16,4 +16,7 @@ response = crawler.run(
     max_search=5
 )
 
-print(pd.DataFrame(response))
+test = pd.DataFrame(response)
+print(test)
+
+test.to_csv("./datas/outputs/test_crawler/test_results.csv", index=False, encoding='utf-8-sig')
