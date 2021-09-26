@@ -3,6 +3,5 @@
 *.html
 __pycache__
 datas
-notebooks
 selenium_d
 scrum*
