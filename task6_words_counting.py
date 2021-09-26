@@ -27,7 +27,7 @@ from os import path
 import nltk
 import numpy as np
 import pandas as pd
-
+from os import makedirs
 
 #%%
 # 1. 크롤링된 2차_Company_Aliance_or_Partner Excel 파일 읽기
@@ -57,13 +57,9 @@ df_crawled['find_words'] = df_crawled.tokens.apply(
 df_crawled['count_words'] = df_crawled.find_words.apply(len)
 
 # 6. 출력 Columns 정의 후, 데이터 정리
-#%%
-from os import makedirs
 makedirs("./datas/outputs/task5", exist_ok=True)
 path_xlsx="./datas/outputs/task5/12차_Company_Aliance_or_Partner_NegCnt.xlsx"
 
 
 with open(path_xlsx, 'wb') as f:
     df_crawled.to_excel(f, engine='openpyxl', encoding='UTF-8')
-# %%
-df_crawled
